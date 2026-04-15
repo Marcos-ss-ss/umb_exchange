@@ -1,0 +1,151 @@
+/* Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Background */
+body {
+    background: linear-gradient(to right, #001f3f, #003366);
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Animation */
+@keyframes fadeSlideUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.login-container {
+    background: white;
+    padding: 35px;
+    border-radius: 12px;
+    width: 350px;
+    max-width: 90%;           /* prevents overflow on small screens */
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+    text-align: center;
+    animation: fadeSlideUp 0.8s ease;
+}
+
+.logo {
+    width: 140px;
+    margin-bottom: 20px;
+    padding: 12px;
+    background: linear-gradient(to right, #001f3f, #003366);
+    border-radius: 10px;
+}
+
+/* Title */
+.login-container h2 {
+    margin-bottom: 15px;
+    color: #001f3f;
+}
+
+/* Input field */
+.login-container input {
+    width: 100%;
+    padding: 12px;
+    margin: 10px 0;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+    transition: 0.2s;
+}
+
+/* Input focus */
+.login-container input:focus {
+    border-color: #003366;
+    box-shadow: 0 0 5px rgba(0, 51, 102, 0.3);
+    outline: none;
+}
+
+/* Button */
+.login-container button {
+    width: 100%;
+    padding: 12px;
+    background: #003366;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+/* Button hover */
+.login-container button:hover {
+    background: #0055a5;
+    transform: translateY(-2px);
+}
+
+/* Message */
+#message {
+    margin-top: 15px;
+    font-size: 14px;
+    color: red;
+}
+
+#codeSection {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    margin-top: 25px;
+    align-items: stretch;
+}
+
+/* INPUT */
+#codeSection input {
+    padding: 14px;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+    font-size: 16px;
+}
+
+/* PRIMARY BUTTON (VERIFY) */
+#codeSection button:first-of-type {
+    background-color: #1e3a5f;
+    color: white;
+    font-size: 18px;
+    font-weight: bold;
+    padding: 14px;
+    border-radius: 10px;
+}
+
+/* RESEND BUTTON */
+#resendBtn {
+    background-color: #e5e7eb;
+    color: #1e3a5f;
+    font-size: 14px;
+    padding: 10px;
+    border-radius: 8px;
+}
+
+/* BACK BUTTON */
+.back-btn {
+    background: none;
+    border: none;
+    color: #1e3a5f;
+    font-size: 14px;
+    margin-top: 5px;
+    cursor: pointer;
+}
+
+/* hover polish */
+#codeSection button:hover {
+    opacity: 0.9;
+}
+
+.back-btn:hover {
+    text-decoration: underline;
+}

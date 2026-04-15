@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Sell a Book</title>
+    <link rel="stylesheet" href="stylesheet.css">
+</head>
+<body>
+
+<div class="sell-container">
+    <h2>Sell a Textbook</h2>
+
+    <form id="listingForm" class="sell-form">
+
+        <select id="course_code" required>
+            <option value="">Select Course</option>
+        </select>
+
+        <input type="text" id="title" placeholder="Book Title" required>
+        <input type="text" id="edition" placeholder="Edition (ex: 5th Edition)">
+        <input type="number" id="price" placeholder="Price" step="0.01" required>
+
+        <select id="book_condition" required>
+            <option value="">Select Condition</option>
+            <option value="New">New</option>
+            <option value="Like New">Like New</option>
+            <option value="Good">Good</option>
+            <option value="Used">Used</option>
+        </select>
+
+        <label>How useful was this book?</label>
+        <div class="star-rating">
+            <span data-value="1">★</span>
+            <span data-value="2">★</span>
+            <span data-value="3">★</span>
+            <span data-value="4">★</span>
+            <span data-value="5">★</span>
+        </div>
+        <p style="font-size:12px; color:gray; margin-top:-10px;">Optional – helps other students decide</p>
+        <input type="hidden" id="rating" name="rating">
+
+        <textarea id="description" placeholder="Optional description..."></textarea>
+
+        <label>Upload Book Image (optional)</label>
+        <input type="file" id="image" accept="image/*">
+
+        <button type="submit">Create Listing</button>
+    </form>
+</div>
+
+<script>
+const stars = document.querySelectorAll(".star-rating span");
+const ratingInput = document.getElementById("rating");
+
+stars.forEach(star => {
+    star.addEventListener("click", () => {
+        const value = star.getAttribute("data-value");
+        ratingInput.value = value;
+        stars.forEach(s => s.classList.remove("active"));
+        for (let i = 0; i < value; i++) stars[i].classList.add("active");
+    });
+});
+
+const courses = [
+    "CS105","CS107","CS109","CS110","CS114L","CS119","CS187SL","CS188SL","CS210","CS220","CS240",
+    "CS271L","CS285L","CS310","CS341","CS410","CS413","CS415","CS420","CS430","CS435","CS436",
+    "CS437","CS438","CS442","CS443","CS444","CS446","CS449","CS450","CS451","CS460","CS461",
+    "CS470","CS478","CS480","CS495","CS498","IT110","IT111L","IT114L","IT116","IT117","IT187SL",
+    "IT188SL","IT220","IT221","IT230L","IT240","IT244","IT246","IT285L","IT341","IT360","IT370",
+    "IT420","IT421","IT425L","IT428L","IT442","IT443","IT444","IT456","IT460","IT461L","IT471",
+    "IT472","IT478","IT480","IT485"
+];
+
+const select = document.getElementById("course_code");
+courses.sort().forEach(course => {
+    const option = document.createElement("option");
+    option.value = course;
+    option.textContent = course;
+    select.appendChild(option);
+});
+
+document.getElementById("listingForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const seller_email = localStorage.getItem("userEmail");
+    const seller_id = localStorage.getItem("userId");
+
+    if (!seller_email || !seller_id) {
+        alert("You must be logged in.");
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append("course_code", select.value);
+    formData.append("title", document.getElementById("title").value);
+    formData.append("edition", document.getElementById("edition").value);
+    formData.append("price", document.getElementById("price").value);
+    formData.append("book_condition", document.getElementById("book_condition").value);
+    formData.append("rating", document.getElementById("rating").value);
+    formData.append("description", document.getElementById("description").value);
+    formData.append("seller_email", seller_email);
+    formData.append("seller_id", seller_id);
+
+    const file = document.getElementById("image").files[0];
+    if (file) formData.append("image", file);
+
+    const res = await fetch("/createListing", { method: "POST", body: formData });
+    const result = await res.json();
+
+    if (result.success) {
+        alert("Listing created!");
+        // Redirect to listings page for that course
+        window.location.href = `listings.html?course=${select.value}`;
+    } else {
+        alert("Error creating listing");
+    }
+});
+</script>
+</body>
+</html>

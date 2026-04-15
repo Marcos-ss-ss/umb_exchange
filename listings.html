@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="stylesheet.css">
+    <title>Course Listings</title>
+
+    <style>
+        /* ⭐ Star styling */
+        .stars {
+            color: #f5b301;
+            font-size: 18px;
+            margin: 5px 0;
+        }
+
+        /* 🔴 Delete button */
+        .delete-btn {
+            background-color: #990000;
+            color: white;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-top: 10px;
+            font-weight: bold;
+            transition: 0.2s;
+        }
+
+        .delete-btn:hover {
+            background-color: #cc0000;
+            transform: scale(1.05);
+        }
+
+        /* 🔵 Contact button */
+        .contact-btn {
+            background-color: #005a9c;
+            color: white;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-top: 8px;
+            margin-right: 5px;
+            font-weight: bold;
+            transition: 0.2s;
+        }
+
+        .contact-btn:hover {
+            background-color: #0073cc;
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+
+<body class="listings">
+
+<nav class="topbar">
+    <div class="logo">
+        <img src="umb-logo.png" alt="UMB Exchange Logo">
+    </div>
+    <div class="nav-links">
+        <a href="./mainpage.html">Home</a>
+        <a href="./sell.html" class="sell-btn">Sell a Book</a>
+        <a href="./messages.html">Messages</a>
+    </div>
+</nav>
+
+<h2 id="course-title"></h2>
+<div id="listings-container"></div>
+
+<script src="/socket.io/socket.io.js"></script>
+
+<script>
+const socket = io();
+
+const params = new URLSearchParams(window.location.search);
+const course = params.get("course") || null;
+
+document.getElementById("course-title").textContent =
+    course ? `Listings for ${course}` : "All Listings";
+
+
+// ⭐ Convert number → stars
+function getStars(rating) {
+    if (!rating) return "<p>No rating</p>";
+
+    let stars = "";
+    for (let i = 0; i < rating; i++) stars += "★";
+    for (let i = rating; i < 5; i++) stars += "☆";
+
+    return `<div class="stars">${stars}</div>`;
+}
+
+
+// 📩 Contact seller
+function contactSeller(sellerId, listingId, courseCode, title) {
+    const userId = localStorage.getItem("userId");
+
+    if (!userId) {
+        alert("You must be logged in.");
+        return;
+    }
+
+    // prevent messaging yourself
+    if (userId == sellerId) {
+        alert("This is your listing.");
+        return;
+    }
+
+    window.location.href =
+        `messages.html?receiver_id=${sellerId}&listing_id=${listingId}&course=${courseCode}&title=${encodeURIComponent(title)}`;
+}
+
+
+async function loadListings() {
+    const url = course ? `/getListings?course=${course}` : '/getListings';
+    const res = await fetch(url);
+    const data = await res.json();
+
+    const container = document.getElementById("listings-container");
+    container.innerHTML = "";
+
+    if (data.length === 0) {
+        container.innerHTML = "<p>No listings yet.</p>";
+        return;
+    }
+
+    const currentUser = localStorage.getItem("userId");
+
+    data.forEach(item => {
+        const div = document.createElement("div");
+        div.className = "listing-card";
+
+        div.innerHTML = `
+            ${item.image ? `<img src="/uploads/${item.image}" class="listing-img">` : ""}
+            
+            <h4>${item.title}</h4>
+            <div class="listing-price">$${item.price}</div>
+
+            <p>${item.book_condition}</p>
+            <p>Edition: ${item.edition || "N/A"}</p>
+
+            ${getStars(item.rating)}
+
+            <p>${item.description || ""}</p>
+
+            <div>
+                ${currentUser != item.seller_id ? `
+                    <button class="contact-btn"
+                        onclick="contactSeller(
+                            ${item.seller_id},
+                            ${item.id},
+                            '${item.course_code}',
+                            '${item.title.replace(/'/g, "\\'")}'
+                        )">
+                        Contact Student
+                    </button>
+                ` : ""}
+
+                ${currentUser == item.seller_id ? `
+                    <button class="delete-btn" onclick="deleteListing(${item.id})">
+                        Delete
+                    </button>
+                ` : ""}
+            </div>
+        `;
+
+        container.appendChild(div);
+    });
+}
+
+
+// 🗑️ Delete listing
+async function deleteListing(id) {
+    const seller_email = localStorage.getItem("userEmail");
+
+    await fetch("/deleteListing", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id, seller_email })
+    });
+
+    loadListings();
+}
+
+
+// 🔥 REAL-TIME UPDATE
+socket.on("newListing", () => loadListings());
+
+loadListings();
+</script>
+
+</body>
+</html>
