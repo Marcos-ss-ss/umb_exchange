@@ -16,15 +16,17 @@ body {
 /* Logo */
 .logo img {
     height: 50px;        
-    transform: scale(4.0);  
-    transform-origin: left center;
+    width: auto;  
+    display: block;
 }
 
 /* --------------------------------------------------- INDEX.HTML LAYOUT ------------------------------------------ */
 /* Navigation Links */
 .nav-links {
     display: flex;
-    gap: 20px;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 15px;
 }
 
 .nav-links a {
@@ -52,6 +54,7 @@ body {
 /* Search Bar */
 .search-container {
     display: flex;
+    flex-wrap: wrap;
 }
 
 .search-container input {
@@ -157,7 +160,7 @@ body {
     padding: 30px 30px; /* ⬅️ reduced from 70px */
     border-radius: 16px;
     box-shadow: 0 10px 25px rgba(0,0,0,0.06);
-    max-width: 700px; /* ⬅️ smaller width */
+    max-width: 100%; /* ⬅️ smaller width */
     width: 100%;
     text-align: center;
 }
@@ -237,7 +240,6 @@ body {
 
 .how-container {
     padding: 20px;
-    max-width: 600px;
 }
 
 .how-container h2 {
